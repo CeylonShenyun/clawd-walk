@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>clawd-walk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root { --paper: #e9e8e0; --card: #faf7ef; --ink: #3f3024; --soft: #8a735e; --brown: #70432c; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.7 "Noto Serif SC", "Songti SC", serif; }
+  main { max-width: 880px; margin: 0 auto; padding: 36px 16px 60px; }
+  h1 { font: 700 40px/1.1 "Dancing Script", cursive; color: var(--brown); margin: 0 0 6px; }
+  .lead { color: var(--soft); margin: 0 0 28px; }
+  h2 { font-size: 17px; margin: 34px 0 12px; }
+  .stage { background: var(--card); border-radius: 4px; padding: 26px 0 30px; display: flex; justify-content: center; box-shadow: 0 1px 2px rgba(70,50,30,.1), 0 6px 14px -10px rgba(70,50,30,.35); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .card { background: var(--card); border-radius: 4px; padding: 12px 14px; box-shadow: 0 1px 2px rgba(70,50,30,.1), 0 6px 14px -10px rgba(70,50,30,.35); }
+  .card .cw { --cw-width: 100%; margin-bottom: 18px; }
+  .when { font-size: 14px; }
+  .zh { font-size: 12.5px; color: var(--soft); }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; justify-content: center; }
+  select, button { font: inherit; font-size: 14px; padding: 5px 10px; border: 1px solid #cdbfa8; border-radius: 4px; background: #fffdf7; color: var(--ink); }
+  button { cursor: pointer; background: var(--brown); color: #fff; border-color: var(--brown); }
+  pre { background: #2f2722; color: #f3eadb; padding: 14px 16px; border-radius: 4px; overflow-x: auto; font: 13px/1.6 ui-monospace, Menlo, monospace; }
+  a { color: var(--brown); }
+</style>
+</head>
+<body>
+<script src="clawd-walk.js"></script>
+<script>
+  // 进页面这一下就是整页加载幕：纸色底，clawd 走到小木屋门口再淡出
+  ClawdWalk.overlay({ minMs: 1600 });
+</script>
+<main>
+  <h1>clawd-walk</h1>
+  <p class="lead">像素 clawd 叼着信，沿红蓝航空虚线走向小木屋的加载条。它会看日子和天气换衣服。一个 js 文件，零依赖，没有图片。</p>
+
+  <h2>试穿</h2>
+  <div class="stage" id="try"></div>
+  <div class="row">
+    <label>手上 <select id="carry"></select></label>
+    <label>头上 <select id="over"></select></label>
+    <label>脖子 <select id="neck"></select></label>
+    <button id="replay">再进一次门</button>
+  </div>
+
+  <h2>衣柜（会自己按日子挑）</h2>
+  <div class="grid" id="wardrobe"></div>
+
+  <h2>用法</h2>
+<pre>&lt;script src="clawd-walk.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  ClawdWalk.overlay({
+    birthday: '03-21',          // 生日：捧蛋糕
+    name: '阿橘',               // 生日那句后面带上名字
+    anniversary: '07-07',       // 纪念日：抱花 + 小心心
+    monthly: 20,                // 每月 20 号叼一朵花
+    trips: [{ from: '2026-10-01', to: '2026-10-07' }],   // 这几天拎行李箱
+    weather: { lat: 31.23, lon: 121.47 }                  // 下雨撑伞、天冷围围巾
+  });
+&lt;/script&gt;</pre>
+  <p class="zh">完整说明见 <a href="https://github.com/CeylonShenyun/clawd-walk">README</a>。</p>
+</main>
+<script>
+  // 试穿
+  var tryBar = ClawdWalk.create({ look: { carry: 'letter', text: ClawdWalk.texts.walk } });
+  document.getElementById('try').appendChild(tryBar.el);
+  function fill(id, slot) {
+    var sel = document.getElementById(id), none = document.createElement('option');
+    none.value = ''; none.textContent = '（不穿）'; sel.appendChild(none);
+    Object.keys(ClawdWalk.items).forEach(function (k) {
+      if (ClawdWalk.items[k].slot !== slot) return;
+      var o = document.createElement('option'); o.value = o.textContent = k; sel.appendChild(o);
+    });
+  }
+  fill('carry', 'cr'); fill('over', 'ov'); fill('neck', 'nk');
+  document.getElementById('carry').value = 'letter';
+  function redress() {
+    tryBar.dress({ carry: document.getElementById('carry').value, over: document.getElementById('over').value,
+      neck: document.getElementById('neck').value, text: ClawdWalk.texts.walk });
+  }
+  ['carry', 'over', 'neck'].forEach(function (id) { document.getElementById(id).addEventListener('change', redress); });
+  document.getElementById('replay').addEventListener('click', function () { ClawdWalk.overlay({ minMs: 1600, manual: true }).done(); });
+
+  // 衣柜：每张卡片里那只来回溜达
+  var bars = [];
+  ClawdWalk.looks.forEach(function (L, i) {
+    var card = document.createElement('div'); card.className = 'card';
+    var bar = ClawdWalk.create({ look: L });
+    card.appendChild(bar.el);
+    card.insertAdjacentHTML('beforeend', '<div class="when"></div><div class="zh"></div>');
+    card.querySelector('.when').textContent = L.when;
+    card.querySelector('.zh').textContent = L.zh;
+    document.getElementById('wardrobe').appendChild(card);
+    bars.push({ bar: bar, phase: i * 0.37 });
+  });
+  (function stroll(t) {
+    bars.forEach(function (b) { b.bar.set(50 + 50 * Math.sin(t / 2600 + b.phase * 6)); });
+    requestAnimationFrame(stroll);
+  })(0);
+  tryBar.set(45);
+</script>
+</body>
+</html>
