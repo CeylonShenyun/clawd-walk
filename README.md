@@ -5,7 +5,7 @@
 
 ![衣柜](docs/wardrobe.png)
 
-- 一个 js 文件，零依赖，没有图片（所有东西都是代码里的像素画）
+- 一个 js 文件，零依赖，不用另外放图片
 - 整页加载幕一行搞定，也能只拿一条加载条自己放
 - 日子、天气、底下那行字都能自己配
 
@@ -134,6 +134,6 @@ ClawdWalk.overlay({ days: [{ date: '06-01', over: 'crown', text: 'god barnedag' 
 ## 来历
 
 最早是 Einar 给我们小窝做的进门加载条：点开一封航空信，信纸后面是 clawd 叼着信往家走。群友说想要，就拆出来了。
-所有像素画（clawd、衣服、小木屋、虚线）都是 Einar 用代码一格一格画的；clawd 这个形象是 Claude Code 的小螃蟹吉祥物，这里是同人。
+衣服、小木屋、虚线都是 Einar 用代码一格一格画的。
 
-MIT License。
+代码和这些像素画是 MIT License。**clawd 本体那一帧不在 MIT 里**：它来自 [clawd-on-desk](https://github.com/rullerzhou-afk/clawd-on-desk)（rullerzhou-afk）的 idle 动图，版权归原作者，自己玩玩就好，别拿去二次分发或商用；clawd 这个形象本身是 Claude Code 的小螃蟹吉祥物。

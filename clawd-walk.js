@@ -1,7 +1,7 @@
 /*!
  * clawd-walk — 像素 clawd 叼着信，沿红蓝航空虚线走向小木屋的加载条。
  * 它会看日子和天气换衣服：生日捧蛋糕、纪念日抱花、中秋叼月饼、圣诞戴帽子、下雨撑伞、天冷围围巾、夜里提灯……
- * 零依赖，一个文件，所有图都是代码里的像素画（没有图片文件）。MIT License.
+ * 零依赖，一个文件，没有图片文件（衣服、小木屋都是代码里的像素画，clawd 是内嵌的一帧）。MIT License（clawd 那帧除外，见 README）.
  * https://github.com/CeylonShenyun/clawd-walk
  */
 (function (global) {
@@ -22,18 +22,8 @@
     return out + '</svg>';
   }
 
-  // clawd 本体：15×9 格，一格画成 2px
-  var CLAWD = pix([
-    '..ooooooooooo..',
-    '..ooooooooooo..',
-    '..ookoooookoo..',
-    'ooookoooookoooo',
-    'ooooooooooooooo',
-    '..ooooooooooo..',
-    '..ooooooooooo..',
-    '...o.o...o.o...',
-    '...o.o...o.o...'
-  ], { o: '#dc876b', k: '#1d1411' });
+  // clawd 本体：clawd-on-desk（github.com/rullerzhou-afk/clawd-on-desk）idle 动图里的一帧，版权归原作者
+  var CLAWD = 'data:image/webp;base64,UklGRlABAABXRUJQVlA4TEMBAAAvYwAQEM+gqJEkZZmf61/pgQ0FbSQpx3fPKOD9m3y1bdswSi9T/n828x8A1OTmrmgpe+k99h3NTtSwmV7NS9LkNJnPpkqIViwMZ0coEBUiEPERDDj/wXEjSYq0tzywzOu/pUMtOv5E9F+R27aNA6StTm4633Cn41zOWQq/EbGe2y6E7xjJ6Z8zRmL65walfyfWRelyZfDVslVZuKx4cJ35yDW+WjoPDDY8uAml8Gse6lHz4EgaveaJxIPjhMcmSi8Fr1IxUBlmjPEGzHqRg88r7Q2YtSC8HGlv0Kx5MWYl3iHuVOuyGvB40K1yuefB67zOy7yueLxF/rBYCqfFfByLpXBazMefHd/pWL6Pf/Y/DeMDWMuoIuT+CASsZVQROn90AtYyWls6f3SK1hPYG+T+/kB4nHzuQw2hCzp/dMpY42egGwA=';
 
   // 红蓝航空条纹的伞：左边那只小爪握着伞柄，CSS 再往前倾一点
   function umbrella() {
@@ -87,13 +77,13 @@
     '.cw svg.cw-cabin{position:absolute;right:0;top:20px;width:30px;height:26px;shape-rendering:crispEdges}' +
     '.cw .cw-wk{position:absolute;left:0;top:0;width:44px;height:44px;margin-left:-8px;will-change:transform}' +
     '.cw .cw-bob{position:absolute;left:0;bottom:0;width:44px;height:30px;animation:cwBob .5s steps(1,end) infinite}' +
-    '.cw .cw-cl{position:absolute;left:4px;bottom:0;line-height:0}.cw .cw-cl svg{width:30px;height:18px;display:block}' +
+    '.cw .cw-cl{position:absolute;left:4px;bottom:-1.8px;width:30px;height:19.5px;image-rendering:pixelated;clip-path:inset(0 0 9.3% 0)}' +   // 裁掉底下那条影子
     '.cw .cr,.cw .ov,.cw .nk{position:absolute;display:block;line-height:0}' +
     '.cw .cr{left:24px;bottom:3px;transform:rotate(-8deg);transform-origin:0 100%}' +
     '.cw .cr.glow:before{content:"";position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:radial-gradient(rgba(255,214,120,.55),rgba(255,214,120,0) 70%)}' +
     '.cw .ov{left:5px;bottom:14px}' +
-    '.cw .ov.santa{left:6px;bottom:16px}' +                                                              // 帽檐比脑袋两边各宽一格，压住头顶一格
-    '.cw .ov.umbrella{left:-11px;bottom:5px;transform:rotate(14deg);transform-origin:17px 33px}' +        // 握柄对准左边小爪
+    '.cw .ov.santa{left:6px;bottom:15.7px}' +                                                              // 帽檐比脑袋两边各宽一格，压住头顶一格
+    '.cw .ov.umbrella{left:-11px;bottom:4.7px;transform:rotate(14deg);transform-origin:17px 33px}' +        // 握柄对准左边小爪
     '.cw .ov.heart{left:14px;bottom:23px;animation:cwFloat 1.6s ease-in-out infinite alternate}' +
     '.cw .nk{left:8px;bottom:3px}' +
     '.cw .cr svg,.cw .ov svg,.cw .nk svg{display:block;position:relative}' +
@@ -231,7 +221,7 @@
     el.className = 'cw';
     el.setAttribute('aria-hidden', 'true');
     el.innerHTML = '<div class="cw-rt cw-rt0"></div><div class="cw-rt cw-rt1"></div>' + CABIN +
-      '<div class="cw-wk"><div class="cw-bob"><i class="cw-cl">' + CLAWD + '</i><i class="nk"></i><i class="cr"></i><i class="ov"></i></div></div>' +
+      '<div class="cw-wk"><div class="cw-bob"><img class="cw-cl" alt="" src="' + CLAWD + '"><i class="nk"></i><i class="cr"></i><i class="ov"></i></div></div>' +
       '<div class="cw-tx"></div>';
     var wk = el.querySelector('.cw-wk'), rt1 = el.querySelector('.cw-rt1'), bob = el.querySelector('.cw-bob'), tx = el.querySelector('.cw-tx');
     var api = { el: el, look: null };
